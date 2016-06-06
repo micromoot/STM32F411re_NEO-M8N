@@ -50,10 +50,57 @@ void GPS_receive( UART_HandleTypeDef *huartptr, uint8_t GPS_Received[])
 	HAL_UART_Receive_DMA(huartptr, (uint8_t *)GPS_Received, GPS_Received[4]+8);
 }
 
-/*void GPS_zero( UART_HandleTypeDef *huartptr, uint8_t GPS_Received[], uint8_t GPS_Zeroed[])
+void GPS_zero( UART_HandleTypeDef *huartptr, uint8_t GPS_Received[], NAV_zeroed * GPS_Zeroed)
 {
-	HAL_UART_Receive_DMA(huartptr, (uint8_t *)GPS_Received, GPS_Received[4]+8);
-}*/
+	
+
+
+		double lon;
+		double lat;
+		double height;
+		double hAcc;
+		double vAcc;
+			
+	if(GPS_Received[3] == 2)
+	{
+		lon = ((NAV_POSLLH*)&GPS_Received[6])->lon;
+		lat = ((NAV_POSLLH*)&GPS_Received[6])->lat;
+		height = ((NAV_POSLLH*)&GPS_Received[6])->height;
+		hAcc = ((NAV_POSLLH*)&GPS_Received[6])->hAcc;
+		vAcc = ((NAV_POSLLH*)&GPS_Received[6])->vAcc;
+	}
+	
+		else if(GPS_Received[3] == 7)
+	{
+		lon = ((NAV_PVT*)&GPS_Received[6])->lon;
+		lat = ((NAV_PVT*)&GPS_Received[6])->lat;
+		height = ((NAV_PVT*)&GPS_Received[6])->height;
+		hAcc = ((NAV_PVT*)&GPS_Received[6])->hAcc;
+		vAcc = ((NAV_PVT*)&GPS_Received[6])->vAcc;
+	}
+		
+	if(GPS_Zeroed->lon == 0)
+	{
+		
+	GPS_Zeroed->lat = lat;
+	GPS_Zeroed->lon = lon;
+	GPS_Zeroed->hMSL = height;
+	GPS_Zeroed->hAcc = hAcc;
+	GPS_Zeroed->vAcc = vAcc;
+	}
+	else{
+	double vGain = GPS_Zeroed->vAcc / (GPS_Zeroed->vAcc + vAcc);
+	GPS_Zeroed->hMSL += vGain * ( height - GPS_Zeroed->hMSL);
+	GPS_Zeroed->vAcc *= 1 - vGain;
+	
+	double hGain = GPS_Zeroed->hAcc / (GPS_Zeroed->hAcc + hAcc);
+	GPS_Zeroed->lat += hGain * ( lat - GPS_Zeroed->lat);
+	GPS_Zeroed->lon += hGain * ( lon - GPS_Zeroed->lon);
+	GPS_Zeroed->hAcc *= 1 - hGain;
+	}
+
+	
+}
 
 
 /*int GPS_calcChecksum(void) {
