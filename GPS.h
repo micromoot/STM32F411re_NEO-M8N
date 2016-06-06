@@ -20,7 +20,6 @@
         } FRAMEUNION;
 
         typedef struct {
-					FRAME Frame;
             uint32_t iTOW;
             int32_t lon; // (units 0.01115m)
             int32_t lat; // units 0.011132*cos(lon/180*3.145926)m
@@ -30,6 +29,15 @@
             unsigned long vAcc;
         unsigned char GPS_checksum[2];
         } NAV_POSLLH;
+				
+				typedef struct {
+            uint32_t test;
+            double lon; // (units 0.01115m)
+            double lat; // units 0.011132*cos(lon/180*3.145926)m
+            double hMSL;
+            double hAcc;
+            double vAcc;
+        } NAV_zeroed;
         
         typedef struct {            
             uint32_t iTOW;
@@ -65,7 +73,6 @@
         unsigned char GPS_checksum[2];
         } NAV_PVT;
         typedef struct {
-					FRAME Frame;
             unsigned long iTOW;
             int32_t ecefX; // (cm)
             int32_t ecefY; // (cm)
@@ -94,6 +101,7 @@
         } FLAGUNION;
 int Init_GPS(UART_HandleTypeDef *huartptr, uint8_t GPS_Received[], uint8_t** GPS_Data);
 void GPS_receive( UART_HandleTypeDef *huartptr, uint8_t GPS_Received[]);
+void GPS_zero( UART_HandleTypeDef *huartptr, uint8_t GPS_Received[], NAV_zeroed * GPS_Zeroed);// this is a kalman filter for a (stationary) GPS receiver
 //        int GPS_calcChecksum(void);
 
 #endif
