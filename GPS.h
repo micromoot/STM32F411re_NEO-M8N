@@ -101,7 +101,7 @@
         } FLAGUNION;
 int Init_GPS(UART_HandleTypeDef *huartptr, uint8_t GPS_Received[], uint8_t** GPS_Data);
 void GPS_receive( UART_HandleTypeDef *huartptr, uint8_t GPS_Received[]);
-void GPS_zero( UART_HandleTypeDef *huartptr, uint8_t GPS_Received[], NAV_zeroed * GPS_Zeroed);// this is a kalman filter for a (stationary) GPS receiver
+void GPS_zero( UART_HandleTypeDef *huartptr, uint8_t GPS_Received[], NAV_zeroed * GPS_Zeroed);// this is a filter designed to narrow down the location for a STATIONARY GPS
 //        int GPS_calcChecksum(void);
 
 #endif
